@@ -6,7 +6,7 @@ class GitHubCalendar {
     this.contributions = [];
     this.options = {
       weekStart: 0, // 0 = Sunday, 1 = Monday
-      daysToShow: 365, // último ano
+      daysToShow: 167,
       perPage: 100, // para fallback REST
       maxPages: 10, // para fallback REST
       proxyBaseUrl: "/.netlify/functions/github-contributions",
@@ -63,11 +63,35 @@ class GitHubCalendar {
     if (!this.container) return;
     this.container.innerHTML = this.renderLoading();
 
-    // Try: proxy GraphQL
+    // Try: proxy GraphQL (enviando from/to/days/weekStart)
     try {
+      // calcula intervalo a enviar ao proxy (alinhado ao weekStart)
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      const toISO = today.toISOString();
+
+      // calcula from com base em daysToShow
+      const daysToShow = Number(this.options.daysToShow) || 167;
+      const fromBase = new Date(today);
+      fromBase.setDate(fromBase.getDate() - (daysToShow - 1));
+      fromBase.setHours(0, 0, 0, 0);
+
+      // alinha ao início da semana conforme weekStart
+      const weekStart = Number(this.options.weekStart) || 0;
+      const dayShift = (fromBase.getDay() - weekStart + 7) % 7;
+      const fromAligned = new Date(fromBase);
+      fromAligned.setDate(fromAligned.getDate() - dayShift);
+      fromAligned.setHours(0, 0, 0, 0);
+
+      // monta URL do proxy com query params
       const proxyUrl = `${this.options.proxyBaseUrl}/${encodeURIComponent(
         this.username
-      )}`;
+      )}?from=${encodeURIComponent(
+        fromAligned.toISOString()
+      )}&to=${encodeURIComponent(toISO)}&days=${encodeURIComponent(
+        daysToShow
+      )}&weekStart=${encodeURIComponent(weekStart)}`;
+
       const res = await fetch(proxyUrl);
       if (!res.ok) {
         const text = await res.text().catch(() => "");
@@ -311,6 +335,7 @@ document.addEventListener("DOMContentLoaded", function () {
       maxPages: 10,
       perPage: 100,
       weekStart: 0,
+      daysToShow: 167,
     }
   );
   githubCalendar.init();

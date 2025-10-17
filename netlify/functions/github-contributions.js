@@ -1,8 +1,8 @@
-// netlify/functions/github-contributions.js
 // Função Netlify para retornar contributionCalendar via GitHub GraphQL
 
 export async function handler(event) {
   try {
+    // captura username (rota ou querystring)
     const username =
       (event.pathParameters && event.pathParameters.username) ||
       (event.queryStringParameters && event.queryStringParameters.username) ||
@@ -22,16 +22,46 @@ export async function handler(event) {
       };
     }
 
-    // Datas: de um ano atrás até hoje (pode ser sobrescrito via query params `from` e `to`)
+    // query params
+    const query = event.queryStringParameters || {};
+
+    // toISO: se enviado, usa; senão usa hoje
     const today = new Date();
-    const toISO =
-      (event.queryStringParameters && event.queryStringParameters.to) ||
-      today.toISOString();
-    const fromISO =
-      (event.queryStringParameters && event.queryStringParameters.from) ||
-      new Date(
-        new Date(toISO).setFullYear(new Date(toISO).getFullYear() - 1)
-      ).toISOString();
+    today.setHours(0, 0, 0, 0);
+    const toISO = query.to || today.toISOString();
+
+    let fromISO = null;
+
+    // if query.days provided, compute fromISO from 'to'
+    if (query.days) {
+      const days = Number(query.days);
+      if (!Number.isNaN(days) && days > 0) {
+        const toDate = new Date(toISO);
+        toDate.setHours(0, 0, 0, 0);
+        const fromDate = new Date(toDate);
+        fromDate.setDate(fromDate.getDate() - (days - 1));
+        fromDate.setHours(0, 0, 0, 0);
+
+        // optional align to weekStart if provided
+        const weekStart = query.weekStart ? Number(query.weekStart) : null;
+        if (weekStart === 0 || weekStart === 1) {
+          const dayShift = (fromDate.getDay() - weekStart + 7) % 7;
+          fromDate.setDate(fromDate.getDate() - dayShift);
+          fromDate.setHours(0, 0, 0, 0);
+        }
+
+        fromISO = fromDate.toISOString();
+      }
+    }
+
+    // se fromISO não calculado via days, prioriza query.from, senão usa 1 ano atrás (fallback)
+    if (!fromISO) {
+      fromISO =
+        query.from ||
+        new Date(
+          new Date(toISO).setFullYear(new Date(toISO).getFullYear() - 1)
+        ).toISOString();
+    }
 
     const GITHUB_TOKEN = process.env.GITHUB_TOKEN;
     if (!GITHUB_TOKEN) {
@@ -107,14 +137,24 @@ export async function handler(event) {
     }
 
     const weeks =
-      json.data.user.contributionsCollection.contributionCalendar.weeks;
-    const days = [];
+      json.data.user.contributionsCollection.contributionCalendar.weeks || [];
+    let days = [];
     weeks.forEach((w) => {
       w.contributionDays.forEach((d) =>
         days.push({ date: d.date, count: d.contributionCount })
       );
     });
+
+    // Ordena asc
     days.sort((a, b) => (a.date < b.date ? -1 : 1));
+
+    // Se query.days foi passada, garante limitar o número de dias retornados
+    if (query.days && Number(query.days) > 0) {
+      const wanted = Number(query.days);
+      if (days.length > wanted) {
+        days = days.slice(days.length - wanted);
+      }
+    }
 
     // Cache control header: permite CDN/cache de borda
     const CACHE_TTL_SECONDS = process.env.CACHE_TTL_SECONDS

@@ -91,7 +91,7 @@
 }
 
 /*-----------------------------------*\
-    #GITHUB CALENDAR
+    #GITHUB CALENDAR CARD
 \*-----------------------------------*/
 
 .github-calendar-card {
@@ -99,13 +99,11 @@
   border: 1px solid var(--border-gradient-onyx);
   border-radius: 16px;
   padding: 20px;
-  margin: 20px 0;
   box-shadow: var(--shadow-2);
   transition: var(--transition-1);
 }
 
 .github-calendar-card:hover {
-  transform: translateY(-2px);
   box-shadow: var(--shadow-3);
 }
 
@@ -256,6 +254,173 @@
   .legend-square {
     width: 8px;
     height: 8px;
+  }
+}
+
+/*-----------------------------------*\
+    #Developer Comunity Card
+\*-----------------------------------*/
+
+.cards {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 20px;
+  align-items: center;
+}
+
+@media (min-width: 768px) {
+  .cards {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+.github-activity {
+  overflow: hidden;
+  transition: var(--transition-1);
+}
+.github-activity:hover {
+  transform: translateY(-2px);
+}
+
+.github-activity #github-calendar-container {
+  width: 100%;
+  max-width: 100%;
+  overflow-x: auto;
+}
+
+.dev-comunity {
+  width: 100%;
+}
+
+.dev-server-card {
+  padding: 16px;
+  position: relative;
+  border-radius: 16px;
+  overflow: hidden;
+  min-height: 220px;
+  display: flex;
+  box-shadow: var(--shadow-2);
+  border: 1px solid var(--border-gradient-onyx);
+
+  background-image: url("../images/banner-dev-comunity.png");
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  transition: transform var(--transition-1), box-shadow var(--transition-1);
+}
+
+.dev-server-card:hover {
+  cursor: pointer;
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-3);
+}
+
+.dev-server-card::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    to bottom right,
+    rgba(10, 10, 10, 0.45),
+    rgba(6, 6, 6, 0.65)
+  );
+  z-index: 0;
+}
+
+.dev-server-card .dev-server-content {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: 100%;
+}
+
+.dev-server-card .dev-server-header {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 0;
+  width: max-content;
+  position: absolute;
+  color: var(--white-2);
+  font-size: var(--fs-4);
+  font-weight: var(--fw-500);
+}
+
+.dev-server-card .discord-icon {
+  width: 20px;
+  height: 20px;
+  display: inline-block;
+  object-fit: contain;
+}
+
+.dev-server-card .dev-server-btn {
+  margin: 180px 0 0 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  width: max-content;
+  padding: 6px 10px;
+  border-radius: 52px;
+  font-size: var(--fs-8);
+  font-weight: var(--fw-500);
+  text-decoration: none;
+  color: var(--white-2);
+  background: #5865f2;
+  position: absolute;
+  z-index: 1;
+  box-shadow: var(--shadow-1);
+  transition: transform var(--transition-1), background var(--transition-1);
+  border: 1px solid rgba(255, 255, 255, 0.04);
+}
+
+.dev-server-card .dev-server-btn:hover,
+.dev-server-card .dev-server-btn:focus {
+  transform: translateY(-2px);
+  background: #7289da;
+  cursor: pointer;
+  color: var(--white-2);
+  outline: none;
+}
+
+.discord-logo {
+  transition: var(--transition-1);
+}
+
+@media (max-width: 767px) {
+  .dev-server-card {
+    min-height: 180px;
+    padding: 16px;
+  }
+
+  .dev-server-card .dev-server-name {
+    font-size: var(--fs-4);
+  }
+
+  .dev-server-card .dev-server-btn {
+    width: 100%;
+    margin: 120px 0 0 0;
+  }
+}
+
+@media (min-width: 768px) {
+  .dev-server-card .dev-server-btn {
+    margin: 150px 0 0 0;
+  }
+}
+
+@media (min-width: 1024px) {
+  .dev-server-card {
+    min-height: 240px;
+  }
+
+  .dev-server-card .dev-server-name {
+    font-size: 28px;
+  }
+  .dev-server-card .dev-server-btn {
+    margin: 180px 0 0 0;
   }
 }
 
