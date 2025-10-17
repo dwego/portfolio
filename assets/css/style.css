@@ -277,9 +277,11 @@
 .github-activity {
   overflow: hidden;
   transition: var(--transition-1);
+  box-shadow: var(--shadow-2);
 }
 .github-activity:hover {
   transform: translateY(-2px);
+  box-shadow: var(--shadow-3);
 }
 
 .github-activity #github-calendar-container {
