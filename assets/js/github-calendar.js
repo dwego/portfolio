@@ -6,7 +6,7 @@ class GitHubCalendar {
     this.contributions = [];
     this.options = {
       weekStart: 0, // 0 = Sunday, 1 = Monday
-      daysToShow: 167,
+      daysToShow: 163,
       perPage: 100, // para fallback REST
       maxPages: 10, // para fallback REST
       proxyBaseUrl: "/.netlify/functions/github-contributions",
@@ -335,7 +335,7 @@ document.addEventListener("DOMContentLoaded", function () {
       maxPages: 10,
       perPage: 100,
       weekStart: 0,
-      daysToShow: 167,
+      daysToShow: 163,
     }
   );
   githubCalendar.init();
